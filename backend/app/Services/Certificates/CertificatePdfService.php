@@ -30,7 +30,7 @@ class CertificatePdfService
         );
 
         $qrCode = Builder::create()
-            ->writer(new PngWriter())
+            ->writer(new PngWriter)
             ->data($verificationUrl)
             ->encoding(new Encoding('UTF-8'))
             ->errorCorrectionLevel(
@@ -45,7 +45,7 @@ class CertificatePdfService
             ->build();
 
         $html = view(
-            'pdf.certificates.default',
+            'certificates.default',
             [
                 'certificate' => $certificate,
                 'verificationUrl' => $verificationUrl,
@@ -53,7 +53,7 @@ class CertificatePdfService
             ]
         )->render();
 
-        $options = new Options();
+        $options = new Options;
         $options->set(
             'defaultFont',
             'DejaVu Sans'
@@ -74,7 +74,7 @@ class CertificatePdfService
             $dompdf->output()
         );
 
-        if (!$saved) {
+        if (! $saved) {
             throw new RuntimeException(
                 'Unable to store the certificate PDF.'
             );

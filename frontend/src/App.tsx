@@ -1,5 +1,9 @@
 import { Navigate, Route, Routes, useParams } from "react-router";
+import { Toaster } from "@/components/ui/sonner";
+import { getAdminSession } from "@/lib/api";
 import CertificatePage from "./pages/CertificatePage";
+import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
+import AdminLoginPage from "./pages/admin/AdminLoginPage";
 import "./App.css";
 
 function VerificationAlias() {
@@ -33,35 +37,52 @@ function Home() {
   );
 }
 
+function RequireAdmin({ children }: { children: React.ReactNode }) {
+  return getAdminSession() ? children : <Navigate to="/admin/login" replace />;
+}
+
 function App() {
   return (
-    <Routes>
-      <Route index element={<Home />} />
+    <>
+      <Routes>
+        <Route index element={<Home />} />
 
-      <Route
-        path="/certificates/:certificateId"
-        element={<CertificatePage />}
-      />
+        <Route path="/admin/login" element={<AdminLoginPage />} />
+        <Route
+          path="/admin"
+          element={
+            <RequireAdmin>
+              <AdminDashboardPage />
+            </RequireAdmin>
+          }
+        />
 
-      <Route
-        path="/verify/certificate/:certificateId"
-        element={<VerificationAlias />}
-      />
+        <Route
+          path="/certificates/:certificateId"
+          element={<CertificatePage />}
+        />
 
-      <Route
-        path="*"
-        element={
-          <main className="verification-page">
-            <section className="result-card">
-              <h1>Page not found</h1>
-              <a className="text-link" href="/">
-                Return to Fueler
-              </a>
-            </section>
-          </main>
-        }
-      />
-    </Routes>
+        <Route
+          path="/verify/certificate/:certificateId"
+          element={<VerificationAlias />}
+        />
+
+        <Route
+          path="*"
+          element={
+            <main className="verification-page">
+              <section className="result-card">
+                <h1>Page not found</h1>
+                <a className="text-link" href="/">
+                  Return to Fueler
+                </a>
+              </section>
+            </main>
+          }
+        />
+      </Routes>
+      <Toaster richColors position="top-right" />
+    </>
   );
 }
 

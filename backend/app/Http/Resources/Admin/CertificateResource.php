@@ -2,10 +2,11 @@
 
 namespace App\Http\Resources\Admin;
 
+use App\Models\Certificate;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Models\Certificate;
 
+/** @mixin Certificate */
 class CertificateResource extends JsonResource
 {
     public function toArray(Request $request): array
@@ -26,11 +27,9 @@ class CertificateResource extends JsonResource
 
             'pdf_path' => $this->pdf_path,
 
-            'revoked_at' =>
-                $this->revoked_at?->toIso8601String(),
+            'revoked_at' => $this->revoked_at?->toIso8601String(),
 
-            'revocation_reason' =>
-                $this->revocation_reason,
+            'revocation_reason' => $this->revocation_reason,
 
             'user' => [
                 'id' => $this->user->id,
@@ -47,7 +46,7 @@ class CertificateResource extends JsonResource
             'revoked_by' => $this->whenLoaded(
                 'revokedBy',
                 function () {
-                    if (!$this->revokedBy) {
+                    if (! $this->revokedBy) {
                         return null;
                     }
 
@@ -59,8 +58,7 @@ class CertificateResource extends JsonResource
                 }
             ),
 
-            'created_at' =>
-                $this->created_at?->toIso8601String(),
+            'created_at' => $this->created_at?->toIso8601String(),
         ];
     }
 }

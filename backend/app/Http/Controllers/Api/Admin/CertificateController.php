@@ -4,15 +4,18 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\IssueCertificateRequest;
-use App\Services\Certificates\CertificateIssuanceService;
-use Carbon\CarbonImmutable;
-use Illuminate\Http\JsonResponse;
 use App\Http\Requests\ListCertificatesRequest;
+use App\Http\Requests\RevokeCertificateRequest;
 use App\Http\Resources\Admin\CertificateResource;
 use App\Models\Certificate;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use App\Http\Requests\RevokeCertificateRequest;
+use App\Services\Certificates\CertificateIssuanceService;
+use App\Services\Certificates\CertificatePdfService;
 use App\Services\Certificates\CertificateRevocationService;
+use Carbon\CarbonImmutable;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class CertificateController extends Controller
 {
@@ -61,10 +64,9 @@ class CertificateController extends Controller
             /**
              * with()
              * loads the related user and program in same operation.
-             * without this, it wil execute additional queries for every certificate. 
+             * without this, it wil execute additional queries for every certificate.
              * N+1 query problem. 1 query for certificates, N queries for users and N queries for programs.
              */
-
             ->with([
                 'user:id,name,email',
                 'program:id,name,type',
@@ -95,13 +97,11 @@ class CertificateController extends Controller
             )
             ->when(
                 $data['status'] ?? null,
-                fn($query, $status) =>
-                $query->where('status', $status)
+                fn ($query, $status) => $query->where('status', $status)
             )
             ->when(
                 $data['creds_program_id'] ?? null,
-                fn($query, $programId) =>
-                $query->where(
+                fn ($query, $programId) => $query->where(
                     'creds_program_id',
                     $programId
                 )
@@ -114,9 +114,8 @@ class CertificateController extends Controller
         return CertificateResource::collection($certificates);
     }
 
-
     /**
-     * here we could have loaded using cert_id but i learned there is thing called "route model binding" 
+     * here we could have loaded using cert_id but i learned there is thing called "route model binding"
      * in laravel
      * that auto finds and loads the certificate using its internal id
      */
@@ -155,9 +154,20 @@ class CertificateController extends Controller
 
         return (new CertificateResource($certificate))
             ->additional([
-                'message' =>
-                    'Certificate revoked successfully.',
+                'message' => 'Certificate revoked successfully.',
             ]);
     }
 
+    public function download(
+        Certificate $certificate,
+        CertificatePdfService $pdfService
+    ): StreamedResponse {
+        $path = $pdfService->getOrGenerate($certificate);
+
+        return Storage::disk('local')->download(
+            $path,
+            sprintf('fueler-certificate-%s.pdf', $certificate->certificate_id),
+            ['Content-Type' => 'application/pdf']
+        );
+    }
 }

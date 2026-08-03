@@ -2,14 +2,15 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Contracts\Validation\ValidationRule;
+use App\Enums\CertificateStatus;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class ListCertificatesRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()->is_admin === true;
+        return $this->user()?->is_admin === true;
     }
 
     public function rules(): array
