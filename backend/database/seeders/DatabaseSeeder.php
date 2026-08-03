@@ -17,9 +17,28 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        User::updateOrCreate(
+            ['email' => 'admin@fueler.io'],
+            [
+                'name' => 'Fueler Admin',
+                'email_verified_at' => now(),
+                'password' => 'password',
+                'is_admin' => true,
+            ]
+        );
+
+        User::updateOrCreate(
+            ['email' => 'participant@example.io'],
+            [
+                'name' => 'Fueler Participant',
+                'email_verified_at' => now(),
+                'password' => 'password',
+                'is_admin' => false,
+            ]
+        );
+
+        $this->call([
+            CredsProgramSeeder::class,
         ]);
     }
 }

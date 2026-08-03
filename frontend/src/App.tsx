@@ -1,37 +1,68 @@
-import { useEffect, useState } from 'react'
-import { api } from './lib/api'
-import './App.css'
+import { Navigate, Route, Routes, useParams } from "react-router";
+import CertificatePage from "./pages/CertificatePage";
+import "./App.css";
 
-type Health = {
-  status: string
-  service: string
-  time: string
+function VerificationAlias() {
+  const { certificateId } = useParams<{
+    certificateId: string;
+  }>();
+
+  return (
+    <Navigate
+      replace
+      to={`/certificates/${encodeURIComponent(certificateId ?? "")}`}
+    />
+  );
+}
+
+function Home() {
+  return (
+    <main className="verification-page">
+      <section className="result-card">
+        <a className="fueler-brand" href="/">
+          fueler
+        </a>
+
+        <h1>Fueler Credentials</h1>
+
+        <p className="result-message">
+          Digitally verified certificates for Fueler programs and achievements.
+        </p>
+      </section>
+    </main>
+  );
 }
 
 function App() {
-  const [health, setHealth] = useState<Health | null>(null)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    api<Health>('/health')
-      .then(setHealth)
-      .catch((err: Error) => setError(err.message))
-  }, [])
-
   return (
-    <section id="center">
-      <h1>fueler</h1>
-      <p>React + Vite frontend, Laravel API backend.</p>
-      {error && <p role="alert">Backend unreachable: {error}</p>}
-      {health && (
-        <p>
-          Backend <strong>{health.service}</strong> is {health.status} (
-          {health.time})
-        </p>
-      )}
-      {!health && !error && <p>Checking backend…</p>}
-    </section>
-  )
+    <Routes>
+      <Route index element={<Home />} />
+
+      <Route
+        path="/certificates/:certificateId"
+        element={<CertificatePage />}
+      />
+
+      <Route
+        path="/verify/certificate/:certificateId"
+        element={<VerificationAlias />}
+      />
+
+      <Route
+        path="*"
+        element={
+          <main className="verification-page">
+            <section className="result-card">
+              <h1>Page not found</h1>
+              <a className="text-link" href="/">
+                Return to Fueler
+              </a>
+            </section>
+          </main>
+        }
+      />
+    </Routes>
+  );
 }
 
-export default App
+export default App;

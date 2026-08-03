@@ -10,12 +10,30 @@ active self notes and thinking process that goes into this assignment. raw thoug
 
 > frontend links to be created : /fueler.io/certificates/[id]
 
-> features/functionality required
+> flow simplified
 
-1. admin: issue certificate to participants
-2. generate and downloadable pdf of certs
-3. unique certificate id
-4. verification certifcates through public verification page
-5. should be unique email of fueler's user account
+1. admin selects an existing fueler user
+2. the admin selects a fellowship/program
+3. BE validates if user is eligible
+4. BE creates certs with unique public id
+5. BE generates a PDF
+6. participant/user receives a public certificate link
+7. anyone can open link, view and verify the cert
+8. admin can revoke it later
+9. a revoked cert remains visible but is no longer valid
 
-" Important: Certificates must always be issued to the same email address as the participant's Fueler account. This ensures certificates remain linked to the correct profile and can later be displayed under the user's Achievements section."
+two main thing:
+program - what user completes
+cert - proof that user completed the program
+
+what i understood in simply manner it can look like:
+
+User: Test User
+Email: test@example.com
+Program: Fueler 30-Day Fellowship
+Certificate: FLR-26-X8D3KP9, Issued to Test User, For Fueler 30-Day Fellowship
+Status: active
+
+---
+
+> setup project (claude did it) - first commit
